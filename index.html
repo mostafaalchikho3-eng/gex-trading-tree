@@ -4,139 +4,259 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>GEX Trading Entscheidungsbaum</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-dark: #0b0e14;
-      --card-bg: #151b26;
-      --card-border: #2a354b;
-      --accent-blue: #3b82f6;
-      --accent-green: #10b981;
-      --accent-red: #ef4444;
-      --accent-purple: #8b5cf6;
-      --text-main: #e2e8f0;
+      --bg-dark: #0f172a;
+      --card-bg: #1e293b;
+      --card-hover: #334155;
+      --card-border: #334155;
+      --accent-blue: #38bdf8;
+      --accent-green: #34d399;
+      --accent-red: #f43f5e;
+      --accent-purple: #c084fc;
+      --text-main: #f8fafc;
       --text-muted: #94a3b8;
     }
 
     body {
-      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       background-color: var(--bg-dark);
+      /* Subtiler Hintergrund-Glow für das moderne Feeling */
+      background-image: 
+        radial-gradient(circle at 15% 50%, rgba(56, 189, 248, 0.04), transparent 25%),
+        radial-gradient(circle at 85% 30%, rgba(52, 211, 153, 0.04), transparent 25%);
       color: var(--text-main);
       margin: 0;
-      padding: 20px;
+      padding: 40px 20px;
       line-height: 1.6;
+      min-height: 100vh;
     }
 
     .container {
-      max-width: 1000px;
+      max-width: 900px;
       margin: 0 auto;
     }
 
-    h1 {
+    .header {
       text-align: center;
-      color: var(--accent-blue);
-      margin-bottom: 8px;
+      margin-bottom: 50px;
+    }
+
+    h1 {
+      color: var(--text-main);
+      font-size: 2.2rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
     }
 
     .subtitle {
-      text-align: center;
       color: var(--text-muted);
-      margin-bottom: 30px;
-      font-size: 0.95rem;
+      font-size: 1.1rem;
+      margin: 0;
     }
 
-    /* Accordion Custom Styling */
+    /* Accordion / Details Boxen */
     details {
       background-color: var(--card-bg);
       border: 1px solid var(--card-border);
-      border-radius: 8px;
-      margin-bottom: 12px;
-      overflow: hidden;
-      transition: all 0.2s ease-in-out;
+      border-radius: 12px;
+      margin-bottom: 16px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      transition: all 0.3s ease;
     }
 
     details[open] {
-      border-color: var(--accent-blue);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
     }
 
+    /* Glow-Effekte für geöffnete Haupt-Ebenen */
+    details.step-setup[open] { border-color: var(--accent-blue); }
+    details.step-long[open] { border-color: var(--accent-green); }
+    details.step-short[open] { border-color: var(--accent-red); }
+
     summary {
-      padding: 14px 18px;
+      padding: 20px 24px;
       font-weight: 600;
-      font-size: 1.05rem;
+      font-size: 1.1rem;
       cursor: pointer;
-      user-select: none;
+      list-style: none;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background-color: rgba(255, 255, 255, 0.02);
+      border-radius: 12px;
+      transition: background-color 0.2s ease;
+    }
+
+    summary::-webkit-details-marker {
+      display: none;
     }
 
     summary:hover {
-      background-color: rgba(255, 255, 255, 0.05);
+      background-color: var(--card-hover);
+    }
+
+    .summary-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    summary::after {
+      content: "▼";
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      transition: transform 0.3s ease;
+    }
+
+    details[open] > summary::after {
+      transform: rotate(180deg);
+    }
+
+    details[open] > summary {
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+      border-bottom: 1px solid var(--card-border);
+      background-color: rgba(255, 255, 255, 0.02);
     }
 
     .content {
-      padding: 16px 20px;
-      border-top: 1px solid var(--card-border);
-      background-color: rgba(0, 0, 0, 0.15);
+      padding: 24px;
+      animation: fadeIn 0.3s ease-in-out;
     }
 
-    /* Nested Details / Unter-Ebenen */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Unter-Ebenen Styling */
     details details {
-      margin-left: 15px;
-      margin-top: 10px;
-      background-color: #1a2232;
+      margin-top: 16px;
+      margin-bottom: 0;
+      background-color: rgba(15, 23, 42, 0.6);
+      border-left: 4px solid var(--card-border);
+      border-radius: 8px;
     }
 
-    /* Badges & Highlights */
-    .badge {
-      padding: 3px 8px;
-      border-radius: 4px;
-      font-size: 0.75rem;
-      font-weight: bold;
-      text-transform: uppercase;
+    details details:not(:last-child) {
+      margin-bottom: 12px;
     }
-    .badge-blue { background: rgba(59, 130, 246, 0.2); color: var(--accent-blue); border: 1px solid var(--accent-blue); }
-    .badge-green { background: rgba(16, 185, 129, 0.2); color: var(--accent-green); border: 1px solid var(--accent-green); }
-    .badge-red { background: rgba(239, 68, 68, 0.2); color: var(--accent-red); border: 1px solid var(--accent-red); }
-    .badge-purple { background: rgba(139, 92, 246, 0.2); color: var(--accent-purple); border: 1px solid var(--accent-purple); }
+
+    details details[open] {
+      border-left-color: var(--accent-blue);
+    }
+
+    details details summary {
+      padding: 16px 20px;
+      font-size: 1rem;
+      font-weight: 500;
+    }
+
+    details details .content {
+      padding: 16px 20px;
+    }
+
+    /* Badges */
+    .badge {
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    
+    .badge-blue { background: rgba(56, 189, 248, 0.1); color: var(--accent-blue); border: 1px solid rgba(56, 189, 248, 0.3); }
+    .badge-green { background: rgba(52, 211, 153, 0.1); color: var(--accent-green); border: 1px solid rgba(52, 211, 153, 0.3); }
+    .badge-red { background: rgba(244, 63, 94, 0.1); color: var(--accent-red); border: 1px solid rgba(244, 63, 94, 0.3); }
+    .badge-purple { background: rgba(192, 132, 252, 0.1); color: var(--accent-purple); border: 1px solid rgba(192, 132, 252, 0.3); }
+
+    /* Infoboxen */
+    .context-box {
+      background: rgba(255,255,255,0.03);
+      padding: 16px 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      color: var(--text-muted);
+      border: 1px solid rgba(255,255,255,0.05);
+      font-size: 0.95rem;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    @media(min-width: 768px) {
+      .info-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    .target-box, .execution-box {
+      padding: 16px 20px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .target-box::before, .execution-box::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; bottom: 0;
+      width: 4px;
+    }
+
+    .target-box { background: rgba(192, 132, 252, 0.05); border: 1px solid rgba(192, 132, 252, 0.1); }
+    .target-box::before { background: var(--accent-purple); }
+
+    .execution-box { background: rgba(244, 63, 94, 0.05); border: 1px solid rgba(244, 63, 94, 0.1); }
+    .execution-box::before { background: var(--accent-red); }
+
+    .box-title {
+      display: block;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      font-weight: 700;
+      margin-bottom: 8px;
+      opacity: 0.9;
+    }
+
+    .target-box .box-title { color: var(--accent-purple); }
+    .execution-box .box-title { color: var(--accent-red); }
 
     ul {
-      margin: 8px 0;
+      margin: 0;
       padding-left: 20px;
+      color: var(--text-muted);
     }
-
-    li {
-      margin-bottom: 6px;
-    }
-
-    .execution-box {
-      background: rgba(239, 68, 68, 0.1);
-      border-left: 4px solid var(--accent-red);
-      padding: 12px;
-      margin-top: 10px;
-      border-radius: 0 6px 6px 0;
-    }
-
-    .target-box {
-      background: rgba(139, 92, 246, 0.1);
-      border-left: 4px solid var(--accent-purple);
-      padding: 12px;
-      margin-top: 10px;
-      border-radius: 0 6px 6px 0;
-    }
+    li { margin-bottom: 10px; }
+    li:last-child { margin-bottom: 0; }
+    strong { color: var(--text-main); font-weight: 600; }
   </style>
 </head>
 <body>
 
 <div class="container">
-  <h1>📊 GEX Trading Entscheidungsbaum</h1>
-  <p class="subtitle">Interaktiver Fahrplan für QQQ Options-Flow & NQ Futures Execution</p>
+  <div class="header">
+    <h1>📊 GEX Trading Entscheidungsbaum</h1>
+    <p class="subtitle">Interaktiver Fahrplan für QQQ Options-Flow & NQ Futures Execution</p>
+  </div>
 
   <!-- STEP 0: PRE-MARKET -->
-  <details>
+  <details class="step-setup">
     <summary>
-      <span>⚙️ SCHRITT 0: Pre-Market Vorbereitung</span>
+      <div class="summary-title">
+        <span>⚙️</span>
+        <span>SCHRITT 0: Pre-Market Vorbereitung</span>
+      </div>
       <span class="badge badge-blue">Setup</span>
     </summary>
     <div class="content">
@@ -150,24 +270,33 @@
   </details>
 
   <!-- EBENE 1: OBERHALB HVL -->
-  <details>
+  <details class="step-long">
     <summary>
-      <span>🔵 PFAD A: Kurs OBERHALB von HVL</span>
+      <div class="summary-title">
+        <span>🔵</span>
+        <span>PFAD A: Kurs OBERHALB von HVL</span>
+      </div>
       <span class="badge badge-green">Long Gamma (Dämpfung)</span>
     </summary>
     <div class="content">
-      <p><strong>Markt-Kontext:</strong> Dealer dämpfen Volatilität (Mean Reversion). Ausbrüche scheitern oft. Fokus auf Abpraller / Range-Boote.</p>
+      <div class="context-box">
+        <strong>Markt-Kontext:</strong> Dealer dämpfen Volatilität (Mean Reversion). Ausbrüche scheitern oft. Fokus auf Abpraller und Range-Boote.
+      </div>
       
       <!-- Unter-Ebene A1 -->
       <details>
         <summary>📍 Location A1: Anlauf an Call Resistance / Gamma Wall (oben)</summary>
         <div class="content">
           <p><strong>Gameplan:</strong> <span class="badge badge-red">Short / Fade</span> (Auf Abpraller & Rücklauf setzen)</p>
-          <div class="target-box">
-            <strong>Take Profit (Targets):</strong> Nächstes tiefes GEX-Level oder Rücklauf zu HVL.
-          </div>
-          <div class="execution-box">
-            <strong>Execution (Futures NQ):</strong> Wechsel zur Futures-Plattform. Warten auf VAH-Rejection, Delta-Abnahme oder Orderbuch-Absorption.
+          <div class="info-grid">
+            <div class="target-box">
+              <span class="box-title">🎯 Take Profit (Targets)</span>
+              Nächstes tiefes GEX-Level oder Rücklauf zu HVL.
+            </div>
+            <div class="execution-box">
+              <span class="box-title">⚡ Execution (Futures NQ)</span>
+              Wechsel zur Futures-Plattform. Warten auf VAH-Rejection, Delta-Abnahme oder Orderbuch-Absorption.
+            </div>
           </div>
         </div>
       </details>
@@ -177,11 +306,15 @@
         <summary>📍 Location A2: Anlauf an Put Support / 0DTE PS (unten)</summary>
         <div class="content">
           <p><strong>Gameplan:</strong> <span class="badge badge-green">Long / Bounce</span> (Auf Erholung & Dip-Kauf setzen)</p>
-          <div class="target-box">
-            <strong>Take Profit (Targets):</strong> Nächstes höheres GEX-Level oder HVL.
-          </div>
-          <div class="execution-box">
-            <strong>Execution (Futures NQ):</strong> Wechsel zur Futures-Plattform. Warten auf Test von VAL / LVN Support mit Kaufvolumen.
+          <div class="info-grid">
+            <div class="target-box">
+              <span class="box-title">🎯 Take Profit (Targets)</span>
+              Nächstes höheres GEX-Level oder HVL.
+            </div>
+            <div class="execution-box">
+              <span class="box-title">⚡ Execution (Futures NQ)</span>
+              Wechsel zur Futures-Plattform. Warten auf Test von VAL / LVN Support mit Kaufvolumen.
+            </div>
           </div>
         </div>
       </details>
@@ -193,29 +326,37 @@
           <p><strong>Gameplan:</strong> <span class="badge badge-blue">Kein Trade</span> (Choppy Zone). Warten, bis der Kurs klare Grenzen ansteuert.</p>
         </div>
       </details>
-
     </div>
   </details>
 
-  <!-- EBENE 1: UNTERHALB HVL -->
-  <details>
+  <!-- EBENE 2: UNTERHALB HVL -->
+  <details class="step-short">
     <summary>
-      <span>🔴 PFAD B: Kurs UNTERHALB von HVL</span>
+      <div class="summary-title">
+        <span>🔴</span>
+        <span>PFAD B: Kurs UNTERHALB von HVL</span>
+      </div>
       <span class="badge badge-red">Short Gamma (Trend & Squeeze)</span>
     </summary>
     <div class="content">
-      <p><strong>Markt-Kontext:</strong> Dealer verstärken Trend-Bewegungen. Hohe Volatilität, große Kerzen. Fokus auf Breakouts.</p>
+      <div class="context-box">
+        <strong>Markt-Kontext:</strong> Dealer verstärken Trend-Bewegungen. Hohe Volatilität, große Kerzen. Fokus auf Breakouts.
+      </div>
 
       <!-- Unter-Ebene B1 -->
       <details>
         <summary>📍 Location B1: Bruch UNTER Put Support / 0DTE PS</summary>
         <div class="content">
           <p><strong>Gameplan:</strong> <span class="badge badge-red">Breakout Short</span> (Trendfolge nach unten mitreiten)</p>
-          <div class="target-box">
-            <strong>Take Profit (Targets):</strong> Tiefliegende GEX-Level oder offener Abwärtsraum.
-          </div>
-          <div class="execution-box">
-            <strong>Execution (Futures NQ):</strong> Pullback an durchbrochene Zone / LVN abverkaufen.
+          <div class="info-grid">
+            <div class="target-box">
+              <span class="box-title">🎯 Take Profit (Targets)</span>
+              Tiefliegende GEX-Level oder offener Abwärtsraum.
+            </div>
+            <div class="execution-box">
+              <span class="box-title">⚡ Execution (Futures NQ)</span>
+              Pullback an durchbrochene Zone / LVN abverkaufen.
+            </div>
           </div>
         </div>
       </details>
@@ -225,11 +366,15 @@
         <summary>📍 Location B2: Durchbruch OBERHALB der Gamma Wall</summary>
         <div class="content">
           <p><strong>Gameplan:</strong> <span class="badge badge-green">Vakuum Breakout Long</span> (Dämpfung löst sich auf)</p>
-          <div class="target-box">
-            <strong>Take Profit (Targets):</strong> Allzeithochs / weit oben liegende GEX-Strikes.
-          </div>
-          <div class="execution-box">
-            <strong>Execution (Futures NQ):</strong> Warten auf Pullback an die durchbrochene Gamma Wall als neuen Support.
+          <div class="info-grid">
+            <div class="target-box">
+              <span class="box-title">🎯 Take Profit (Targets)</span>
+              Allzeithochs / weit oben liegende GEX-Strikes.
+            </div>
+            <div class="execution-box">
+              <span class="box-title">⚡ Execution (Futures NQ)</span>
+              Warten auf Pullback an die durchbrochene Gamma Wall als neuen Support.
+            </div>
           </div>
         </div>
       </details>
@@ -239,11 +384,15 @@
         <summary>📍 Location B3: Seitwärts / Konsolidierung unter HVL</summary>
         <div class="content">
           <p><strong>Gameplan:</strong> <span class="badge badge-red">Pullback Short</span> (Erholungen Richtung HVL abverkaufen)</p>
-          <div class="target-box">
-            <strong>Take Profit (Targets):</strong> Nächstes tiefes GEX-Level.
-          </div>
-          <div class="execution-box">
-            <strong>Execution (Futures NQ):</strong> Feilschen an der HVL-Kante bei Rejection.
+          <div class="info-grid">
+            <div class="target-box">
+              <span class="box-title">🎯 Take Profit (Targets)</span>
+              Nächstes tiefes GEX-Level.
+            </div>
+            <div class="execution-box">
+              <span class="box-title">⚡ Execution (Futures NQ)</span>
+              Feilschen an der HVL-Kante bei Rejection.
+            </div>
           </div>
         </div>
       </details>
