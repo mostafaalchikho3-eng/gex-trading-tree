@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GEX Trading Entscheidungsbaum</title>
+  <style>
+    :root {
+      --bg-dark: #0b0e14;
+      --card-bg: #151b26;
+      --card-border: #2a354b;
+      --accent-blue: #3b82f6;
+      --accent-green: #10b981;
+      --accent-red: #ef4444;
+      --accent-purple: #8b5cf6;
+      --text-main: #e2e8f0;
+      --text-muted: #94a3b8;
+    }
+
+    body {
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      margin: 0;
+      padding: 20px;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      text-align: center;
+      color: var(--accent-blue);
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: var(--text-muted);
+      margin-bottom: 30px;
+      font-size: 0.95rem;
+    }
+
+    /* Accordion Custom Styling */
+    details {
+      background-color: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      margin-bottom: 12px;
+      overflow: hidden;
+      transition: all 0.2s ease-in-out;
+    }
+
+    details[open] {
+      border-color: var(--accent-blue);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    summary {
+      padding: 14px 18px;
+      font-weight: 600;
+      font-size: 1.05rem;
+      cursor: pointer;
+      user-select: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: rgba(255, 255, 255, 0.02);
+    }
+
+    summary:hover {
+      background-color: rgba(255, 255, 255, 0.05);
+    }
+
+    .content {
+      padding: 16px 20px;
+      border-top: 1px solid var(--card-border);
+      background-color: rgba(0, 0, 0, 0.15);
+    }
+
+    /* Nested Details / Unter-Ebenen */
+    details details {
+      margin-left: 15px;
+      margin-top: 10px;
+      background-color: #1a2232;
+    }
+
+    /* Badges & Highlights */
+    .badge {
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+    .badge-blue { background: rgba(59, 130, 246, 0.2); color: var(--accent-blue); border: 1px solid var(--accent-blue); }
+    .badge-green { background: rgba(16, 185, 129, 0.2); color: var(--accent-green); border: 1px solid var(--accent-green); }
+    .badge-red { background: rgba(239, 68, 68, 0.2); color: var(--accent-red); border: 1px solid var(--accent-red); }
+    .badge-purple { background: rgba(139, 92, 246, 0.2); color: var(--accent-purple); border: 1px solid var(--accent-purple); }
+
+    ul {
+      margin: 8px 0;
+      padding-left: 20px;
+    }
+
+    li {
+      margin-bottom: 6px;
+    }
+
+    .execution-box {
+      background: rgba(239, 68, 68, 0.1);
+      border-left: 4px solid var(--accent-red);
+      padding: 12px;
+      margin-top: 10px;
+      border-radius: 0 6px 6px 0;
+    }
+
+    .target-box {
+      background: rgba(139, 92, 246, 0.1);
+      border-left: 4px solid var(--accent-purple);
+      padding: 12px;
+      margin-top: 10px;
+      border-radius: 0 6px 6px 0;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>📊 GEX Trading Entscheidungsbaum</h1>
+  <p class="subtitle">Interaktiver Fahrplan für QQQ Options-Flow & NQ Futures Execution</p>
+
+  <!-- STEP 0: PRE-MARKET -->
+  <details>
+    <summary>
+      <span>⚙️ SCHRITT 0: Pre-Market Vorbereitung</span>
+      <span class="badge badge-blue">Setup</span>
+    </summary>
+    <div class="content">
+      <ul>
+        <li><strong>All-Expiry Level zeichnen:</strong> HVL (Volatility Flip), Call Resistance, Put Support, Gamma Wall.</li>
+        <li><strong>0DTE Level zeichnen:</strong> 0DTE HVL, 0DTE Call Resistance, 0DTE Put Support.</li>
+        <li><strong>GEX-Rangliste (1-10):</strong> Alle Top 10 Gamma-Strikes als horizontale Farblinien markieren.</li>
+        <li><strong>Futures Profile laden:</strong> Value Area High (VAH), Value Area Low (VAL), Low Volume Nodes (LVN) auf NQ.</li>
+      </ul>
+    </div>
+  </details>
+
+  <!-- EBENE 1: OBERHALB HVL -->
+  <details>
+    <summary>
+      <span>🔵 PFAD A: Kurs OBERHALB von HVL</span>
+      <span class="badge badge-green">Long Gamma (Dämpfung)</span>
+    </summary>
+    <div class="content">
+      <p><strong>Markt-Kontext:</strong> Dealer dämpfen Volatilität (Mean Reversion). Ausbrüche scheitern oft. Fokus auf Abpraller / Range-Boote.</p>
+      
+      <!-- Unter-Ebene A1 -->
+      <details>
+        <summary>📍 Location A1: Anlauf an Call Resistance / Gamma Wall (oben)</summary>
+        <div class="content">
+          <p><strong>Gameplan:</strong> <span class="badge badge-red">Short / Fade</span> (Auf Abpraller & Rücklauf setzen)</p>
+          <div class="target-box">
+            <strong>Take Profit (Targets):</strong> Nächstes tiefes GEX-Level oder Rücklauf zu HVL.
+          </div>
+          <div class="execution-box">
+            <strong>Execution (Futures NQ):</strong> Wechsel zur Futures-Plattform. Warten auf VAH-Rejection, Delta-Abnahme oder Orderbuch-Absorption.
+          </div>
+        </div>
+      </details>
+
+      <!-- Unter-Ebene A2 -->
+      <details>
+        <summary>📍 Location A2: Anlauf an Put Support / 0DTE PS (unten)</summary>
+        <div class="content">
+          <p><strong>Gameplan:</strong> <span class="badge badge-green">Long / Bounce</span> (Auf Erholung & Dip-Kauf setzen)</p>
+          <div class="target-box">
+            <strong>Take Profit (Targets):</strong> Nächstes höheres GEX-Level oder HVL.
+          </div>
+          <div class="execution-box">
+            <strong>Execution (Futures NQ):</strong> Wechsel zur Futures-Plattform. Warten auf Test von VAL / LVN Support mit Kaufvolumen.
+          </div>
+        </div>
+      </details>
+
+      <!-- Unter-Ebene A3 -->
+      <details>
+        <summary>📍 Location A3: Mittlere Range (zwischen GEX 4 und GEX 10)</summary>
+        <div class="content">
+          <p><strong>Gameplan:</strong> <span class="badge badge-blue">Kein Trade</span> (Choppy Zone). Warten, bis der Kurs klare Grenzen ansteuert.</p>
+        </div>
+      </details>
+
+    </div>
+  </details>
+
+  <!-- EBENE 1: UNTERHALB HVL -->
+  <details>
+    <summary>
+      <span>🔴 PFAD B: Kurs UNTERHALB von HVL</span>
+      <span class="badge badge-red">Short Gamma (Trend & Squeeze)</span>
+    </summary>
+    <div class="content">
+      <p><strong>Markt-Kontext:</strong> Dealer verstärken Trend-Bewegungen. Hohe Volatilität, große Kerzen. Fokus auf Breakouts.</p>
+
+      <!-- Unter-Ebene B1 -->
+      <details>
+        <summary>📍 Location B1: Bruch UNTER Put Support / 0DTE PS</summary>
+        <div class="content">
+          <p><strong>Gameplan:</strong> <span class="badge badge-red">Breakout Short</span> (Trendfolge nach unten mitreiten)</p>
+          <div class="target-box">
+            <strong>Take Profit (Targets):</strong> Tiefliegende GEX-Level oder offener Abwärtsraum.
+          </div>
+          <div class="execution-box">
+            <strong>Execution (Futures NQ):</strong> Pullback an durchbrochene Zone / LVN abverkaufen.
+          </div>
+        </div>
+      </details>
+
+      <!-- Unter-Ebene B2 -->
+      <details>
+        <summary>📍 Location B2: Durchbruch OBERHALB der Gamma Wall</summary>
+        <div class="content">
+          <p><strong>Gameplan:</strong> <span class="badge badge-green">Vakuum Breakout Long</span> (Dämpfung löst sich auf)</p>
+          <div class="target-box">
+            <strong>Take Profit (Targets):</strong> Allzeithochs / weit oben liegende GEX-Strikes.
+          </div>
+          <div class="execution-box">
+            <strong>Execution (Futures NQ):</strong> Warten auf Pullback an die durchbrochene Gamma Wall als neuen Support.
+          </div>
+        </div>
+      </details>
+
+      <!-- Unter-Ebene B3 -->
+      <details>
+        <summary>📍 Location B3: Seitwärts / Konsolidierung unter HVL</summary>
+        <div class="content">
+          <p><strong>Gameplan:</strong> <span class="badge badge-red">Pullback Short</span> (Erholungen Richtung HVL abverkaufen)</p>
+          <div class="target-box">
+            <strong>Take Profit (Targets):</strong> Nächstes tiefes GEX-Level.
+          </div>
+          <div class="execution-box">
+            <strong>Execution (Futures NQ):</strong> Feilschen an der HVL-Kante bei Rejection.
+          </div>
+        </div>
+      </details>
+
+    </div>
+  </details>
+
+</div>
+
+</body>
+</html>
